@@ -1,0 +1,32 @@
+name: Keep Alive
+
+on:
+  schedule:
+    # 每天 UTC 时间 00:00 触发
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Make a dummy commit
+        run: |
+          echo "Keep alive: $(date)" >> keep-alive.txt
+          git add keep-alive.txt
+          git commit -m "Keep alive: $(date)"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main # 替换为你的分支名称
